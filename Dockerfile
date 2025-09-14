@@ -31,6 +31,7 @@ RUN groupmod --gid $USER_GID $USERNAME \
 RUN echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 RUN mkdir -p /workspaces/dev
+
 WORKDIR /workspaces/dev
 
 USER $USERNAME

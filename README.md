@@ -42,6 +42,33 @@ This Dockerfile creates a comprehensive development container that includes Node
 - Docker or compatible container runtime
 - For Claude Code: Anthropic API key (set via environment variables)
 
+## Usage
+
+Add the following `docker-compose.dev.yml` to your project:
+
+```yml
+services:
+  claude:
+    image: 'ghcr.io/leoborai/docker-claude:latest'
+    volumes:
+      - ../:/workspaces/dev
+    command: sleep infinity
+```
+
+Then run the Docker Compose file:
+
+```bash
+docker compose -f docker-compose.dev.yml up --build --detach
+```
+
+Finally _exec_ into the running container:
+
+```bash
+docker exec -it <container_id> bash
+```
+
+Claude will be available as `claude` command in the terminal.
+
 ## Notes
 
 - The container runs as a non-root user for security
