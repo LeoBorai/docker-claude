@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  publish_image:
+    name: Publish image
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate Version
+        run: |
+          VERSION_SHA="$(echo ${GITHUB_SHA:0:7})"
+          echo "VERSION=$VERSION_SHA" >> $GITHUB_ENV
+
+      - name: Build Image
+        run: |
+          docker build -t "docker-claude:${{ env.VERSION }}" .
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish image to GitHub Container Registry
+        run: |
+          docker tag docker-claude:${{ env.VERSION }} ghcr.io/leoborai/docker-claude:${{ env.VERSION }}
+          docker tag docker-claude:${{ env.VERSION }} ghcr.io/leoborai/docker-claude:latest
+          docker push ghcr.io/leoborai/docker-claude:${{ env.VERSION }}
+          docker push ghcr.io/leoborai/docker-claude:latest
+
+      - name: Create Release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.request(`POST /repos/${{ github.repository }}/releases`, {
+              tag_name: "${{ env.VERSION }}",
+              generate_release_notes: true
+            });
