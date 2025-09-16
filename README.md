@@ -58,7 +58,7 @@ services:
 Then run the Docker Compose file:
 
 ```bash
-docker compose -f docker-compose.dev.yml up --build --detach
+docker compose -f ./dev/docker-compose.dev.yml up --build --detach
 ```
 
 Finally _exec_ into the running container:
