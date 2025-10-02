@@ -20,6 +20,9 @@ RUN curl -fsSL https://bun.sh/install | bash
 # Install Claude Code
 RUN npm install -g @anthropic-ai/claude-code
 
+# Install GitHub Copilot CLI
+RUN npm install -g @github/copilot
+
 ARG USERNAME=node
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
